@@ -1,64 +1,80 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pro QR Code Generator</title>
-  <!-- TailwindCSS CDN -->
+  <title>Text & Image URL to QR</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-thumb { background-color: rgba(100,100,100,0.4); border-radius: 4px; }
-  </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
-  <!-- HEADER -->
-  <header class="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 shadow-md">
+  <header class="p-4 flex justify-between items-center bg-white dark:bg-gray-800 shadow">
     <h1 class="text-2xl font-bold">Pro QR Code</h1>
-    <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+    <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
       🌙
     </button>
   </header>
 
-  <!-- MAIN CONTENT -->
   <main class="flex-grow container mx-auto p-6">
     <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
       <!-- TABS -->
       <div class="flex">
-        <button id="tab-text" class="flex-1 py-3 font-semibold text-center border-b-4 border-teal-500">Text</button>
-        <button id="tab-image" class="flex-1 py-3 font-semibold text-center border-b-4 border-transparent hover:border-teal-500 transition">Image</button>
+        <button id="tabText" class="flex-1 py-3 font-semibold text-center border-b-4 border-indigo-500">
+          Text
+        </button>
+        <button id="tabImg" class="flex-1 py-3 font-semibold text-center border-b-4 border-transparent hover:border-indigo-500 transition">
+          Image URL
+        </button>
       </div>
 
-      <!-- TAB CONTENT -->
+      <!-- CONTENT -->
       <div class="p-6 space-y-6">
-        <!-- TEXT TAB -->
-        <div id="content-text">
-          <input id="textInput" type="text" placeholder="Enter your text..." 
-            class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-teal-500 transition" />
+        <!-- TEXT -->
+        <div id="contentText">
+          <input id="textInput" type="text" placeholder="Ketikan teks di sini..." 
+                 class="w-full p-3 border rounded-lg focus:outline-indigo-500 transition"/>
+          <div class="flex justify-between mt-2">
+            <div>
+              <label>Dot Color:</label>
+              <input id="dotColor" type="color" value="#4F46E5" class="ml-2"/>
+            </div>
+            <div>
+              <label>BG Color:</label>
+              <input id="bgColor" type="color" value="#FFFFFF" class="ml-2"/>
+            </div>
+          </div>
           <button onclick="generateTextQR()" 
-            class="w-full py-3 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-semibold transition">
+                  class="w-full mt-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-lg transition">
             Generate Text QR
           </button>
         </div>
 
-        <!-- IMAGE TAB -->
-        <div id="content-image" class="hidden">
-          <input id="imgInput" type="file" accept="image/*" 
-            class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg transition"/>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Max file size: 20 KB</p>
-          <button onclick="generateImageQR()" 
-            class="w-full py-3 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-semibold transition">
-            Generate Image QR
+        <!-- IMAGE URL -->
+        <div id="contentImg" class="hidden">
+          <input id="imgUrlInput" type="url" placeholder="https://contoh.com/gambar.jpg"
+                 class="w-full p-3 border rounded-lg focus:outline-indigo-500 transition"/>
+          <img id="imgPreview" class="mt-4 mx-auto max-h-40 object-contain hidden rounded-lg shadow" alt="Preview"/>
+          <div class="flex justify-between mt-2">
+            <div>
+              <label>Dot Color:</label>
+              <input id="dotColor2" type="color" value="#10B981" class="ml-2"/>
+            </div>
+            <div>
+              <label>BG Color:</label>
+              <input id="bgColor2" type="color" value="#FFFFFF" class="ml-2"/>
+            </div>
+          </div>
+          <button onclick="generateImageURLQR()" 
+                  class="w-full mt-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-lg transition">
+            Generate Image‑URL QR
           </button>
         </div>
 
-        <!-- QR PREVIEW + DOWNLOAD -->
+        <!-- QR + Download -->
         <div class="flex flex-col items-center">
-          <div id="qrContainer" class="p-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg"></div>
+          <div id="qrBox" class="p-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg"></div>
           <button id="downloadBtn" onclick="downloadQR()" 
-            class="mt-4 px-6 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium shadow" 
-            hidden>
+                  class="mt-4 px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium shadow" 
+                  hidden>
             ⬇️ Download PNG
           </button>
         </div>
@@ -66,92 +82,99 @@
     </div>
   </main>
 
-  <!-- FOOTER -->
   <footer class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
     &copy; 2025 Pro QR Code
   </footer>
 
-  <!-- QR Code Styling CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.browser.js"></script>
+  <!-- QRCode.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+          integrity="sha512-qU+/eV3XDHzMxakpm2D3A1npIHTsQRtqZJoQ+31YXZZ/azg7X/F/wg+8+okWWIB0xS3pLGRSoCTrZh3NL1IzUA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <script>
-    // Dark‑mode toggle
-    const themeBtn = document.getElementById('theme-toggle');
-    themeBtn.addEventListener('click', () => {
+    // dark-mode
+    document.getElementById('themeToggle').onclick = () => {
       document.documentElement.classList.toggle('dark');
-      themeBtn.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
-    });
+      event.currentTarget.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+    };
 
-    // Tab switching
-    const tabText = document.getElementById('tab-text'),
-          tabImage = document.getElementById('tab-image'),
-          contentText = document.getElementById('content-text'),
-          contentImage = document.getElementById('content-image');
+    // tab switch
+    const tabText = document.getElementById('tabText'),
+          tabImg  = document.getElementById('tabImg'),
+          contT   = document.getElementById('contentText'),
+          contI   = document.getElementById('contentImg'),
+          qrBox   = document.getElementById('qrBox'),
+          downloadBtn = document.getElementById('downloadBtn');
     tabText.onclick = () => {
-      tabText.classList.add('border-teal-500');
-      tabImage.classList.remove('border-teal-500');
-      contentText.classList.remove('hidden');
-      contentImage.classList.add('hidden');
+      tabText.classList.add('border-indigo-500');
+      tabImg.classList.remove('border-indigo-500');
+      contT.classList.remove('hidden');
+      contI.classList.add('hidden');
       resetQR();
     };
-    tabImage.onclick = () => {
-      tabImage.classList.add('border-teal-500');
-      tabText.classList.remove('border-teal-500');
-      contentImage.classList.remove('hidden');
-      contentText.classList.add('hidden');
+    tabImg.onclick = () => {
+      tabImg.classList.add('border-indigo-500');
+      tabText.classList.remove('border-indigo-500');
+      contI.classList.remove('hidden');
+      contT.classList.add('hidden');
       resetQR();
     };
 
-    // QR Code Styling instance
-    let qrCode = null;
-    const qrContainer = document.getElementById('qrContainer');
-    const downloadBtn = document.getElementById('downloadBtn');
-
+    let qrcode; 
     function resetQR() {
-      qrContainer.innerHTML = '';
+      qrBox.innerHTML = '';
       downloadBtn.hidden = true;
-      qrCode = null;
+      qrcode = null;
     }
 
     function generateTextQR() {
-      const text = document.getElementById('textInput').value.trim();
-      if (!text) return alert('Please enter some text!');
+      const txt = document.getElementById('textInput').value.trim();
+      if (!txt) return alert('Masukkan teks dulu!');
       resetQR();
-      qrCode = new QRCodeStyling({
-        width: 260,
-        height: 260,
-        data: text,
-        dotsOptions:    { color: "#10B981", type: "rounded" },
-        backgroundOptions: { color: "transparent" },
-        imageOptions:   { crossOrigin: "anonymous", margin: 5 }
+      const dot = document.getElementById('dotColor').value;
+      const bg  = document.getElementById('bgColor').value;
+      qrcode = new QRCode(qrBox, {
+        text: txt,
+        width: 256,
+        height: 256,
+        colorDark : dot,
+        colorLight: bg,
+        correctLevel: QRCode.CorrectLevel.H
       });
-      qrCode.append(qrContainer);
       downloadBtn.hidden = false;
     }
 
-    function generateImageQR() {
-      const file = document.getElementById('imgInput').files[0];
-      if (!file) return alert('Please choose an image!');
-      if (file.size > 20 * 1024) return alert('File too large! Max 20 KB.');
-      const reader = new FileReader();
-      reader.onload = e => {
-        resetQR();
-        qrCode = new QRCodeStyling({
-          width: 260,
-          height: 260,
-          data: e.target.result,      // encode image data
-          dotsOptions:    { color: "#8B5CF6", type: "dots" },
-          backgroundOptions: { color: "transparent" },
-          imageOptions:   { crossOrigin: "anonymous", margin: 5 }
-        });
-        qrCode.append(qrContainer);
-        downloadBtn.hidden = false;
-      };
-      reader.readAsDataURL(file);
+    function generateImageURLQR() {
+      const url = document.getElementById('imgUrlInput').value.trim();
+      if (!url) return alert('Masukkan URL gambar!');
+      resetQR();
+      // preview
+      const img = document.getElementById('imgPreview');
+      img.src = url; img.classList.remove('hidden');
+
+      const dot = document.getElementById('dotColor2').value;
+      const bg  = document.getElementById('bgColor2').value;
+      qrcode = new QRCode(qrBox, {
+        text: url,
+        width: 256,
+        height: 256,
+        colorDark : dot,
+        colorLight: bg,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      downloadBtn.hidden = false;
     }
 
     function downloadQR() {
-      if (!qrCode) return;
-      qrCode.download({ name: "qrcode", extension: "png" });
+      if (!qrcode) return;
+      // QRCode.js buat <img> di dalam qrBox
+      const img = qrBox.querySelector('img') || qrBox.querySelector('canvas');
+      if (img) {
+        const link = document.createElement('a');
+        link.href = img.src;
+        link.download = 'qrcode.png';
+        link.click();
+      }
     }
   </script>
 </body>
