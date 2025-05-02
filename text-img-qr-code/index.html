@@ -1,93 +1,157 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Text & Image to QR</title>
+  <title>Pro QR Code Generator</title>
+  <!-- TailwindCSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background-color: rgba(100,100,100,0.4); border-radius: 4px; }
+  </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
-  <header class="p-4 flex justify-between items-center bg-white dark:bg-gray-800 shadow">
-    <h1 class="text-xl font-bold">QR Code Pro</h1>
-    <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+  <!-- HEADER -->
+  <header class="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 shadow-md">
+    <h1 class="text-2xl font-bold">Pro QR Code</h1>
+    <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
       🌙
     </button>
   </header>
 
+  <!-- MAIN CONTENT -->
   <main class="flex-grow container mx-auto p-6">
-    <div class="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-      <!-- Tab Buttons -->
+    <div class="max-w-lg mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+      <!-- TABS -->
       <div class="flex">
-        <button id="tab-text" class="flex-1 py-3 font-semibold text-center border-b-2 border-teal-500">Text</button>
-        <button id="tab-image" class="flex-1 py-3 font-semibold text-center border-b-2 border-transparent hover:border-teal-500 transition">Image</button>
+        <button id="tab-text" class="flex-1 py-3 font-semibold text-center border-b-4 border-teal-500">Text</button>
+        <button id="tab-image" class="flex-1 py-3 font-semibold text-center border-b-4 border-transparent hover:border-teal-500 transition">Image</button>
       </div>
-      <!-- Content -->
+
+      <!-- TAB CONTENT -->
       <div class="p-6 space-y-6">
-        <!-- Text Tab -->
+        <!-- TEXT TAB -->
         <div id="content-text">
-          <input id="textInput" type="text" placeholder="Enter your text..." class="w-full p-3 border rounded-lg focus:outline-teal-500"/>
-          <button onclick="generateTextQR()" class="w-full py-3 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-semibold transition">Generate Text QR</button>
-          <div id="textQR" class="mt-4 flex justify-center"></div>
+          <input id="textInput" type="text" placeholder="Enter your text..." 
+            class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-teal-500 transition" />
+          <button onclick="generateTextQR()" 
+            class="w-full py-3 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-semibold transition">
+            Generate Text QR
+          </button>
         </div>
-        <!-- Image Tab -->
+
+        <!-- IMAGE TAB -->
         <div id="content-image" class="hidden">
-          <input id="imgInput" type="file" accept="image/*" class="w-full p-3 border rounded-lg"/>
-          <button onclick="generateImageQR()" class="w-full py-3 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-semibold transition">Generate Image QR</button>
-          <div id="imgQR" class="mt-4 flex justify-center"></div>
+          <input id="imgInput" type="file" accept="image/*" 
+            class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg transition"/>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Max file size: 20 KB</p>
+          <button onclick="generateImageQR()" 
+            class="w-full py-3 bg-teal-500 hover:bg-teal-600 rounded-lg text-white font-semibold transition">
+            Generate Image QR
+          </button>
+        </div>
+
+        <!-- QR PREVIEW + DOWNLOAD -->
+        <div class="flex flex-col items-center">
+          <div id="qrContainer" class="p-4 bg-white dark:bg-gray-900 rounded-lg shadow-lg"></div>
+          <button id="downloadBtn" onclick="downloadQR()" 
+            class="mt-4 px-6 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium shadow" 
+            hidden>
+            ⬇️ Download PNG
+          </button>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- QRCode.js dari CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-  <script>
-    // theme toggle
-    document.getElementById('theme-toggle')
-      .addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-        const btn = event.currentTarget;
-        btn.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
-      });
+  <!-- FOOTER -->
+  <footer class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+    &copy; 2025 Pro QR Code
+  </footer>
 
-    // tab switching
+  <!-- QR Code Styling CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.browser.js"></script>
+  <script>
+    // Dark‑mode toggle
+    const themeBtn = document.getElementById('theme-toggle');
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      themeBtn.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+    });
+
+    // Tab switching
     const tabText = document.getElementById('tab-text'),
           tabImage = document.getElementById('tab-image'),
           contentText = document.getElementById('content-text'),
           contentImage = document.getElementById('content-image');
-
-    tabText.addEventListener('click', () => {
+    tabText.onclick = () => {
       tabText.classList.add('border-teal-500');
       tabImage.classList.remove('border-teal-500');
       contentText.classList.remove('hidden');
       contentImage.classList.add('hidden');
-    });
-    tabImage.addEventListener('click', () => {
+      resetQR();
+    };
+    tabImage.onclick = () => {
       tabImage.classList.add('border-teal-500');
       tabText.classList.remove('border-teal-500');
       contentImage.classList.remove('hidden');
       contentText.classList.add('hidden');
-    });
+      resetQR();
+    };
 
-    // QR generators
-    function clearQR(el) {
-      el.innerHTML = '';
+    // QR Code Styling instance
+    let qrCode = null;
+    const qrContainer = document.getElementById('qrContainer');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    function resetQR() {
+      qrContainer.innerHTML = '';
+      downloadBtn.hidden = true;
+      qrCode = null;
     }
+
     function generateTextQR() {
       const text = document.getElementById('textInput').value.trim();
-      const box = document.getElementById('textQR');
-      clearQR(box);
       if (!text) return alert('Please enter some text!');
-      new QRCode(box, { text, width: 200, height: 200 });
+      resetQR();
+      qrCode = new QRCodeStyling({
+        width: 260,
+        height: 260,
+        data: text,
+        dotsOptions:    { color: "#10B981", type: "rounded" },
+        backgroundOptions: { color: "transparent" },
+        imageOptions:   { crossOrigin: "anonymous", margin: 5 }
+      });
+      qrCode.append(qrContainer);
+      downloadBtn.hidden = false;
     }
+
     function generateImageQR() {
       const file = document.getElementById('imgInput').files[0];
-      const box = document.getElementById('imgQR');
-      clearQR(box);
       if (!file) return alert('Please choose an image!');
+      if (file.size > 20 * 1024) return alert('File too large! Max 20 KB.');
       const reader = new FileReader();
-      reader.onload = e => new QRCode(box, { text: e.target.result, width: 200, height: 200 });
+      reader.onload = e => {
+        resetQR();
+        qrCode = new QRCodeStyling({
+          width: 260,
+          height: 260,
+          data: e.target.result,      // encode image data
+          dotsOptions:    { color: "#8B5CF6", type: "dots" },
+          backgroundOptions: { color: "transparent" },
+          imageOptions:   { crossOrigin: "anonymous", margin: 5 }
+        });
+        qrCode.append(qrContainer);
+        downloadBtn.hidden = false;
+      };
       reader.readAsDataURL(file);
+    }
+
+    function downloadQR() {
+      if (!qrCode) return;
+      qrCode.download({ name: "qrcode", extension: "png" });
     }
   </script>
 </body>
