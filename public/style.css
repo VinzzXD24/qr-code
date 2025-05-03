@@ -1,0 +1,49 @@
+:root {
+    --primary: #2A2F4F;
+    --secondary: #917FB3;
+    --accent: #E5BEEC;
+    --background: #FDE2F3;
+    --error: #ff4444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: var(--background);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    width: 100%;
+    height: 95vh;
+}
+
+.chat-header {
+    text-align: center;
+    padding: 20px;
+    background: var(--primary);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.chat-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    height: calc(100% - 20px);
+    display: flex;
+    flex-direction: column;
+}
+
+/* [Tambahkan semua style sebelumnya di sini] */
