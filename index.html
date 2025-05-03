@@ -1,38 +1,91 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Code Generator</title>
-  <!-- Tailwind via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KilatPedia AI</title>
+    <link rel="stylesheet" href="/public/style.css">
 </head>
-<body class="bg-gradient-to-r from-teal-500 to-blue-600 text-white min-h-screen flex flex-col">
-  <header class="p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">QR Code Pro</h1>
-    <button id="theme-toggle" class="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30">
-      🌙
-    </button>
-  </header>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1>KilatPedia AI</h1>
+                <p>Powered by DeepSeek R1</p>
+            </div>
+            
+            <div class="messages" id="messages">
+                <div class="message bot-message">
+                    Selamat datang! Silakan bertanya apapun.
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing">
+                <div class="typing-dot"></div>
+                <div class="typing-dot" style="animation-delay: 0.2s"></div>
+                <div class="typing-dot" style="animation-delay: 0.4s"></div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Ketik pesan..." />
+                <button onclick="sendMessage()" id="sendButton">Kirim</button>
+            </div>
+        </div>
+    </div>
 
-  <main class="flex-grow flex flex-col justify-center items-center text-center px-4">
-    <h2 class="text-4xl font-extrabold mb-6">Generate Your QR Code Instantly</h2>
-    <p class="mb-8 max-w-xl">Buat QR Code untuk teks atau gambar langsung di browser, tanpa kirim data ke server manapun.</p>
-    <a href="/text-img-qr-code" class="px-6 py-3 bg-white text-teal-600 font-semibold rounded-lg shadow-lg hover:shadow-xl transition">
-      Get Started
-    </a>
-  </main>
+    <script>
+        const API_ENDPOINT = '/api/chat';
+        const messagesContainer = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typing');
+        const sendButton = document.getElementById('sendButton');
+        let isProcessing = false;
 
-  <footer class="p-4 text-sm text-center">
-    &copy; 2025 QR Code Pro
-  </footer>
+        async function sendMessage() {
+            if (isProcessing) return;
+            
+            const prompt = userInput.value.trim();
+            if (!prompt) return;
 
-  <script>
-    const btn = document.getElementById('theme-toggle');
-    btn.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-      btn.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
-    });
-  </script>
+            addMessage(prompt, 'user');
+            userInput.value = '';
+            sendButton.disabled = true;
+            typingIndicator.style.display = 'flex';
+            isProcessing = true;
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Server error');
+                }
+
+                addMessage(data.response, 'bot');
+            } catch (error) {
+                addMessage(`Error: ${error.message}`, 'error');
+                console.error('Error:', error);
+            } finally {
+                isProcessing = false;
+                typingIndicator.style.display = 'none';
+                sendButton.disabled = false;
+            }
+        }
+
+        function addMessage(text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
 </body>
 </html>
