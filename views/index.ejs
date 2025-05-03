@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HDR Converter</title>
+</head>
+<body>
+    <h1>Upload Gambar untuk HDR</h1>
+    <form action="/process" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Process</button>
+    </form>
+    
+    <% if (resultUrl) { %>
+        <h2>Hasil:</h2>
+        <img src="<%= resultUrl %>" alt="HDR Result" style="max-width: 100%;">
+    <% } %>
+</body>
+</html>
